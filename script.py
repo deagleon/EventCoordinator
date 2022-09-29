@@ -4,18 +4,21 @@ guests = {}
 def read_guestlist(file_name):
     text_file = open(file_name, 'r')
     sended_guest = None
+    line_data = []
     while True:
-        line_data = text_file.readline().strip().split(",")
+        sended_guest = yield line_data
         if sended_guest is not None:
             line_data = sended_guest.split(",")
-        if len(line_data) < 2:
-            # If no more lines, close file
-            text_file.close()
-            break
+        else:
+            line_data = text_file.readline().strip().split(",")
+            if len(line_data) < 2:
+                # If no more lines, close file
+                text_file.close()
+                break
+
         name = line_data[0]
         age = int(line_data[1])
         guests[name] = age
-        sended_guest = yield line_data
 
 
 r = read_guestlist("guest_list.txt")
@@ -76,11 +79,11 @@ def combined_tables():
 def assign_table(guests, generator):
     i = 1
     for guest in guests:
-        print(f'{i}.{(guest, next(generator))}')
+        # print(f'{i}.{(guest, next(generator))}')
         yield (guest, next(generator))
         i += 1
 
 list_tables = assign_table(guests, combined_tables())
-
-for table in list(list_tables):
+for table in list_tables:
     print(table)
+
